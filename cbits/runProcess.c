@@ -234,6 +234,13 @@ terminateProcess (ProcHandle handle)
 }
 
 int
+killProcess (ProcHandle handle)
+{
+    return (kill(handle, SIGKILL) == 0);
+}
+
+
+int
 getProcessExitCode (ProcHandle handle, int *pExitCode)
 {
     int wstat, res;
@@ -494,6 +501,16 @@ cleanup_err:
 
 int
 terminateProcess (ProcHandle handle)
+{
+    if (!TerminateProcess((HANDLE) handle, 1)) {
+	maperrno();
+	return -1;
+    }
+    return 0;
+}
+
+int
+killProcess (ProcHandle handle)
 {
     if (!TerminateProcess((HANDLE) handle, 1)) {
 	maperrno();
