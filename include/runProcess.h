@@ -73,5 +73,6 @@ extern ProcHandle runInteractiveProcess( wchar_t *cmd,
 #endif
 
 extern int terminateProcess( ProcHandle handle );
+extern int killProcess( ProcHandle handle );
 extern int getProcessExitCode( ProcHandle handle, int *pExitCode );
 extern int waitForProcess( ProcHandle handle, int *ret );
