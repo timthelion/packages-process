@@ -61,6 +61,7 @@ module System.Process (
         waitForProcess,
         getProcessExitCode,
         terminateProcess,
+        killProcess,
         interruptProcessGroupOf,
 #endif
  ) where
@@ -616,6 +617,20 @@ terminateProcess ph = do
         return p_
         -- does not close the handle, we might want to try terminating it
         -- again, or get its exit code.
+-- ----------------------------------------------------------------------------
+-- killProcess
+
+-- | Sends a kill signal on POSIX systems.  Same as terminateProcess on Windows.
+killProcess :: ProcessHandle -> IO ()
+killProcess ph = do
+  withProcessHandle_ ph $ \p_ ->
+    case p_ of
+      ClosedHandle _ -> return p_
+      OpenHandle h -> do
+        throwErrnoIfMinus1Retry_ "killProcess" $ c_killProcess h
+        return p_
+        -- does not close the handle, we might want to try killing it
+        -- again, or get its exit code.
 
 -- ----------------------------------------------------------------------------
 -- interruptProcessGroupOf
@@ -689,6 +704,11 @@ getProcessExitCode ph = do
 
 foreign import ccall unsafe "terminateProcess"
   c_terminateProcess
+        :: PHANDLE
+        -> IO CInt
+
+foreign import ccall unsafe "killProcess"
+  c_killProcess
         :: PHANDLE
         -> IO CInt
 
